@@ -4,6 +4,7 @@ import UseSetUserIntel from '../../services/hooks/UseSetUserIntel';
 import { Modal, Button , Typography, Box, Backdrop, Fade, TextField, Alert , CircularProgress } from '@mui/material';
 import { getAllUsersData } from '../../services/api/apiServices';
 import { userType , kindType , userDataType } from '../../types/sharedTypes';
+import { setNewUserToDB } from '../../services/api/apiServices';
 
 const FirstScreenModal = ():JSX.Element => {
 
@@ -33,7 +34,7 @@ const FirstScreenModal = ():JSX.Element => {
       setIsLoading(true);
        switch (kind) {
         case "oldUser":
-          if (userData.name === "" || userData.password === ""){
+          if (userData.nickName === "" || userData.password === ""){
             setIsLoading(false);
             return alert("Please fill all fields");
            }
@@ -41,7 +42,7 @@ const FirstScreenModal = ():JSX.Element => {
           .then( data =>  {
            setIsLoading(false);
            const findedUser = [...data.data].filter( (user : userType) => user.nickName.toLowerCase() === userData.nickName.toLowerCase());
-           setUser(findedUser[0].nicknickName);
+           setUser(findedUser[0].nickName);
            return;
           })
          case "newUser": 
@@ -54,7 +55,9 @@ const FirstScreenModal = ():JSX.Element => {
            setIsLoading(false);
            const isUserExists = [...data.data].some( (user : userType) => user.nickName.toLowerCase() === userData.nickName.toLowerCase());
            if (!isUserExists) {
-            return alert("I will implement adding user to DB later");
+            setNewUserToDB(userData);
+            setUser(userData.nickName);
+            return;
            }
            if (isUserExists) {
             return alert("Such user already exists");

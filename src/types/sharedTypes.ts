@@ -1,14 +1,14 @@
 // redux types
 export interface IUserSlice {
-    activeUser: String,
-    talkingTo: String
+    activeUser: string,
+    talkingTo: string
 }
 
 // props
 
 export interface ISingleMessageProps {
-    message : String,
-    date: String,
+    message : string,
+    date: string,
     position: "user" | "opponent"
   }
 
@@ -19,17 +19,17 @@ export type userDataType = "name" | "lastName" | "password" | "nickName";
 
 // database
 export type userType = {
-  name?: String,
-  lastName?: String,
-  password: String,
-  nickName: String,
+  name?: string,
+  lastName?: string,
+  password: string,
+  nickName: string,
 }
 
 export type messagesArrayType = {
-    from : String,
-    to: String,
-    date: String,
-    message: String
+    from : string,
+    to: string,
+    date: string,
+    message: string
   }
 
  

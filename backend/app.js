@@ -3,7 +3,7 @@ const app = express();
 const port = 3200;
 require('dotenv').config();
 const cors = require('cors');
-const bdApi = require('./schemas');
+const DBAPI = require('./schemas');
 const mongoose = require('mongoose');
 
 const mongoUser = process.env.USER_NAME;
@@ -13,6 +13,12 @@ app.use(express.json());
 app.use(cors({
   origin: '*'
 }));
+
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 200,
+};
 
 const mongoConnect = async () => {
     try {
@@ -36,7 +42,7 @@ app.get('/', (req, res) => {
 
 app.get('/users', (req, res) => {
     const userList = async( ) => {
-    await bdApi.UsersModel.find({})
+    await DBAPI.UsersModel.find({})
     .then( data => {
      res.send(data)
  })
@@ -44,6 +50,19 @@ app.get('/users', (req, res) => {
    userList();
  });
 
- app.post('/users', (req, res) => {
-  
+ app.get("/messages/:nickname", (req, res) => {
+   const nickName = req.params.nickname;
+   const messagesList = async () => {
+    await DBAPI.MessagesModel.find({to : `${nickName}`})
+    .then( data => {
+      res.send(data)
+    })
+   }
+   messagesList();
+ })
+
+ app.post('/users', cors(corsOptions) , async (req, res) => {
+   const newUser = req.body;
+   await DBAPI.UsersModel.insertMany([newUser])
+   res.send(newUser)
  })
