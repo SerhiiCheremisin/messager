@@ -3,8 +3,9 @@ import { ModalStyled } from '../../styles/sharedMuiStyles';
 import UseSetUserIntel from '../../services/hooks/UseSetUserIntel';
 import { Modal, Button , Typography, Box, Backdrop, Fade, TextField, Alert , CircularProgress } from '@mui/material';
 import { getAllUsersData } from '../../services/api/apiServices';
-import { userType , kindType , userDataType } from '../../types/sharedTypes';
+import { userType , kindType , userDataType, AlertHandlerType } from '../../types/sharedTypes';
 import { setNewUserToDB } from '../../services/api/apiServices';
+import CustomAlert from './CustomAlert';
 
 const FirstScreenModal = ():JSX.Element => {
 
@@ -17,6 +18,15 @@ const FirstScreenModal = ():JSX.Element => {
     });
     const [isLoading, setIsLoading] = useState(false);
     const [userKind, setUserKind] = useState<kindType>("oldUser");
+    const [alertOptions, setAlertOptions] = useState<AlertHandlerType>({
+      isShown : false,
+      text: "",
+      type: "error"
+    })
+
+    const cleanUpHandler = ():void =>  {
+      setAlertOptions({...alertOptions, isShown: false })
+    }
 
     const customBackgroundColorNew = userKind === "newUser" ? "red" : "";
     const customBackgroundColorOld = userKind === "newUser" ? "" : "red";
@@ -32,23 +42,29 @@ const FirstScreenModal = ():JSX.Element => {
  
     const closeModalHandler = (kind :kindType ):void => {
       setIsLoading(true);
-       switch (kind) {
-        case "oldUser":
-          if (userData.nickName === "" || userData.password === ""){
-            setIsLoading(false);
-            return alert("Please fill all fields");
-           }
-          getAllUsersData()
-          .then( data =>  {
-           setIsLoading(false);
-           const findedUser = [...data.data].filter( (user : userType) => user.nickName.toLowerCase() === userData.nickName.toLowerCase());
-           setUser(findedUser[0].nickName);
-           return;
-          })
-         case "newUser": 
-         if (userData.name === "" || userData.password === "" || userData.name === "" || userData.lastName === "") {
+      if ( kind === "oldUser" ) {
+        if (userData.nickName === "" || userData.password === ""){
           setIsLoading(false);
-          return alert("Please fill all fields");
+          setAlertOptions( { ...alertOptions, isShown: true, text: "Please fill all fields" })
+          return;
+         }
+        getAllUsersData()
+        .then( data =>  {
+         setIsLoading(false);
+         const findedUser = [...data.data].filter( (user : userType) => user.nickName.toLowerCase() === userData.nickName.toLowerCase());
+         if ( findedUser.length === 0) {
+          setAlertOptions( { ...alertOptions, isShown: true, text: "Such user does not exist or you added wrong data" })
+          return;
+         }
+         setUser(findedUser[0].nickName);
+         return;
+        })
+      }
+      else {
+        if (userData.name === "" || userData.password === "" || userData.name === "" || userData.lastName === "") {
+          setIsLoading(false);
+          setAlertOptions( { ...alertOptions, isShown: true, text: "Please fill all fields" })
+          return;
          }
          getAllUsersData()
           .then( data =>  {
@@ -60,10 +76,11 @@ const FirstScreenModal = ():JSX.Element => {
             return;
            }
            if (isUserExists) {
-            return alert("Such user already exists");
+            setAlertOptions( { ...alertOptions, isShown: true, text: "Such user already exists" })
+            return;
            }
           })
-       }
+      }
     } 
 
   if (isLoading) {
@@ -94,7 +111,7 @@ const FirstScreenModal = ():JSX.Element => {
     )
   }    
   return (
-    <Box>
+    <Box sx={{position: 'relative'}}>
     <Modal
      aria-labelledby="transition-modal-title"
      aria-describedby="transition-modal-description"
@@ -124,6 +141,7 @@ const FirstScreenModal = ():JSX.Element => {
           {userKind === "newUser" && <TextField onChange={(e) => userDataHandler( "lastName", e.target.value)} value={userData.lastName} id="filled-basic" label="Your Last Name" variant="filled" />}
           </Box>
           <Button onClick={() => closeModalHandler(userKind)} variant="outlined">{`${cusomButtonText}`}</Button> 
+          { alertOptions.isShown && <CustomAlert cleanUp={cleanUpHandler} text={`${alertOptions.text}`} type={`${alertOptions.type}`}/> }
        </Box>
      </Fade>
    </Modal>

@@ -12,10 +12,23 @@ export interface ISingleMessageProps {
     position: "user" | "opponent"
   }
 
+ export interface ICUstomAlertProps  {
+ text: string,
+ type: alertType,
+ cleanUp: Function
+} 
+
 
 // other utilities
 export type kindType = "newUser" | "oldUser";
 export type userDataType = "name" | "lastName" | "password" | "nickName";
+export type alertType = "success" | "info" | "warning" | "error";
+
+export type AlertHandlerType = {
+  isShown : boolean,
+  text: string,
+  type: alertType
+}
 
 // database
 export type userType = {
