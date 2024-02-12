@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import SingleMessage from './SingleMessage';
+import { getMessagesStory } from '../../services/api/apiServices';
 import TextInput from './TextInput';
 import { MessageWrapper , MessageHeaderColumn , SingleMessageText  } from '../../styles/sharedMuiStyles';
 //Mui
 import { Typography } from '@mui/material';
 import { messagesArrayType } from '../../types/sharedTypes';
 
-import { mockedMessages } from '../../services/mockedUsers';
 import UseGetUserIntel from '../../services/hooks/UseGetUserIntel';
 
 const Messages = ():JSX.Element => {
@@ -15,14 +15,18 @@ const Messages = ():JSX.Element => {
   const [ activeMessages, setActiveMessage ] = useState<any[]>([]);
   
   useEffect( () => {
-   const active:messagesArrayType[] = mockedMessages.filter( (el:messagesArrayType) => el.from === talkTo && el.to === activeUser );
-   const passive:messagesArrayType[] = mockedMessages.filter( (el:messagesArrayType) => el.from === activeUser && el.to === talkTo );
-   const sorted = [...active,...passive].sort( (a:any, b:any)  => {
-    let dateA = new Date(a.date);
-    let dateB = new Date(b.date);
-    return +dateA - +dateB;
-   });
-   setActiveMessage(sorted);
+    getMessagesStory(`${activeUser}`)
+    .then( (data) => {
+      const recievedMessage = [...data.data[0]].filter( (message:messagesArrayType) => message.from === `${talkTo}`)
+      const sentMessages = [...data.data[1]].filter( (message:messagesArrayType) => message.to === `${talkTo}`)
+      const sorted = [...recievedMessage,...sentMessages].sort( (a:any, b:any)  => {
+        let dateA = new Date(a.date);
+        let dateB = new Date(b.date);
+        return +dateA - +dateB;
+       });
+       setActiveMessage(sorted);
+    })
+
   },[talkTo])
 
   if (talkTo == "") {
@@ -43,6 +47,5 @@ const Messages = ():JSX.Element => {
     </MessageWrapper>
   )
 }
-
 
 export default Messages;

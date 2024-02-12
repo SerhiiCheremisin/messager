@@ -53,7 +53,20 @@ app.get('/users', (req, res) => {
  app.get("/messages/:nickname", (req, res) => {
    const nickName = req.params.nickname;
    const messagesList = async () => {
-    await DBAPI.MessagesModel.find({to : `${nickName}`})
+   await DBAPI.MessagesModel.find({to : `${nickName}`})
+    .then( data => {
+      res.send(data)
+    })
+   }
+   messagesList();
+ })
+
+ app.get("/message-story/:nickname", (req, res) => {
+  const nickName = req.params.nickname;
+   const messagesList = async () => {
+    const recievedMessage =  await DBAPI.MessagesModel.find({to : `${nickName}`});
+    const deviveredMessages = await DBAPI.MessagesModel.find({from: `${nickName}`});
+    Promise.all([recievedMessage, deviveredMessages])
     .then( data => {
       res.send(data)
     })

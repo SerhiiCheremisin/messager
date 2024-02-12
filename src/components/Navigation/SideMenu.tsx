@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { mockedUsers } from '../../services/mockedUsers';
 import UserSingleButton from './UserSingleButton';
 import { colors } from '../../styles/colors';
 import UseGetUserIntel from '../../services/hooks/UseGetUserIntel';

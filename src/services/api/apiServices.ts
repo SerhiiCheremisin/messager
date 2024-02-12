@@ -42,3 +42,14 @@ export const getOpponents = async (nickName: string) : Promise<any> => {
   console.log(error)
  }
 }
+
+export const getMessagesStory = async (nickName: string) : Promise<any> => {
+  try {
+    const request = await axios ({ method: 'get',
+    url: `http://localhost:3200/message-story/${nickName}`});
+    return request;
+   } 
+   catch (error) {
+    console.log(error)
+   }
+}

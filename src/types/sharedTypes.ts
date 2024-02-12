@@ -42,7 +42,8 @@ export type messagesArrayType = {
     from : string,
     to: string,
     date: string,
-    message: string
+    message: string,
+    _id: string
   }
 
  
